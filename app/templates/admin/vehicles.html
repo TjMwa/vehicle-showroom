@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Vehicles - Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage Vehicles</h1>
+        <a href="{{ url_for('main.add_vehicle') }}" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Add New Vehicle
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Image</th>
+                            <th>Vehicle</th>
+                            <th>Year</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vehicle in vehicles %}
+                        <tr>
+                            <td>
+                                {% if vehicle.image_filename %}
+                                <img src="{{ url_for('static', filename='uploads/' + vehicle.image_filename) }}"
+                                    alt="Thumb" style="width: 50px; height: 50px; object-fit: cover;" class="rounded">
+                                {% else %}
+                                <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="bi bi-image"></i>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ vehicle.make }} {{ vehicle.model }}</strong></td>
+                            <td>{{ vehicle.year }}</td>
+                            <td>${{ "{:,.2f}".format(vehicle.price) }}</td>
+                            <td>
+                                <span class="badge bg-{% if vehicle.is_available %}success{% else %}danger{% endif %}">
+                                    {{ 'Available' if vehicle.is_available else 'Sold' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('main.edit_vehicle', id=vehicle.id) }}"
+                                        class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal{{ vehicle.id }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal{{ vehicle.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Confirm Delete</h5>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete the <strong>{{ vehicle.year }} {{
+                                                    vehicle.make }} {{ vehicle.model }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Cancel</button>
+                                                <form action="{{ url_for('main.delete_vehicle', id=vehicle.id) }}"
+                                                    method="POST" style="display:inline;">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
